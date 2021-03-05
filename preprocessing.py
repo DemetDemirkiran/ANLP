@@ -1,5 +1,5 @@
 import nltk
-
+import re
 from nltk.sentiment.util import _show_plot
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords, state_union
@@ -35,85 +35,115 @@ import os
 from os import path
 import ast
 import multidict as multidict
+from nltk.stem import WordNetLemmatizer
 
 
+def read():
+    with open('/home/demet/Desktop/ANLP_Project/Electronics.txt', 'r') as f:
+        electronics = f.read()
+    f.close()
+    return electronics
 
 
-def text_to_dict():
-
-    ...
-
-def lowercase():
-
-    ...
-
-def numbers():
-
-    ...
+def read_pos():
+    with open('/home/demet/Desktop/ANLP_Project/positive_words.txt', 'r') as f:
+        positive = f.read()
+    f.close()
+    return positive
 
 
-def stopwords():
-
-    ...
-
-def punctuation():
-
-    ...
-
-def spaces():
-
-    ...
+def read_neg():
+    with open('/home/demet/Desktop/ANLP_Project/negative_words.txt', 'r') as f:
+        negative = f.read()
+    f.close()
+    return negative
 
 
+def text_to_dict(electronics):
+    dictionary_for_reviews = list(electronics)
+    return dictionary_for_reviews
 
-def tokenize():
-    #tokenize
-    ...
 
+def lowercase(texts_from_dict):
+    lower_text = texts_from_dict.lower()
+    return lower_text
+
+
+def numbers(texts_from_dict):
+    no_numbers = re.sub('[0-9]+', '', texts_from_dict)
+    return no_numbers
+
+
+def punctuation_and_spaces(texts_from_dict):
+    # removes [!”#$%&’()*+,-./:;<=>?@[\]^_`{|}~]
+
+    texts_from_dict = texts_from_dict.split()
+    no_pnc_space_text = texts_from_dict.translate(string.maketrans("", ""), string.punctuation)
+    return no_pnc_space_text
+
+
+def tokenize(texts_from_dict):
+    stop_words = set(stopwords.words('english'))
+    tokenize = word_tokenize(texts_from_dict.lower())
+    # filtered_sentence = [w for w in tokenize if not w in stop_words]
+    texts_from_dict = str.maketrans('', '', string.punctuation)
+    stripped_texts_from_dict = [w.translate(texts_from_dict) for w in tokenize]
+    words = [w for w in stripped_texts_from_dict if w.isalpha()]  # numbers
+    filtered_stripped_texts_from_dict = [w for w in words if not w in stop_words]
+    filtered_stripped_texts_from_dict = []
+
+    for w in words:
+        if w not in stop_words:
+            filtered_stripped_texts_from_dict.append(w)
+
+    return filtered_stripped_texts_from_dict
 
 
 def positive_tagging():
-
-
     ...
 
 
 def negative_tagging():
-
-
     ...
 
 
+def pos_tagging(texts_from_dict):
+    tagged_text = pos_tag(texts_from_dict)
+    exclude = set(string.punctuation)
+    stripped_dict = [w for w in tagged_text if w not in exclude]
+    return stripped_dict
 
 
-def lemmanization():
-    ...
+def stemming(texts_from_dict):
+    ps = nltk.SnowballStemmer()
+    stemmed_text = []
+    for w in texts_from_dict:
+        stemmed_text.append(ps.stem(w))
+    return stemmed_text
 
 
-
-
-def stemming():
-
-    ...
+def lemmanization(texts_from_dict):
+    lemmatizer = WordNetLemmatizer()
+    lemma_sentence = []
+    for word in texts_from_dict:
+        lemma_sentence.append(lemmatizer.lemmatize(word))
+        lemma_sentence.append(" ")
+    return "".join(lemma_sentence)
 
 
 def summarize():
     ...
 
+
 def chunking():
-
     ...
 
-def part_of_speech():
-
-    ...
 
 def ner():
-
     ...
 
-def relation_extraction():
 
+def relation_extraction():
     ...
 
 

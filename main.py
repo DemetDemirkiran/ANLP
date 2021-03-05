@@ -1,5 +1,4 @@
 import nltk
-
 from nltk.sentiment.util import _show_plot
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords, state_union
@@ -35,18 +34,20 @@ import os
 from os import path
 import ast
 import multidict as multidict
+from preprocessing import text_to_dict, read
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     nltk.download('averaged_perceptron_tagger')
     nltk.download('punkt')
     nltk.download('stopwords')
+    nltk.download('wordnet')
+
+    reviews = read()
+    dictionary = text_to_dict(reviews)
+    print(dictionary)
+
 
 
 
