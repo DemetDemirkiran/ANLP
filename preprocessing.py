@@ -36,10 +36,11 @@ from os import path
 import ast
 import multidict as multidict
 from nltk.stem import WordNetLemmatizer
-
+import re
+from tqdm import tqdm
 
 def read():
-    with open('/home/demet/Desktop/ANLP_Project/Electronics.txt', 'r') as f:
+    with open('/home/demet/Desktop/ANLP_Project/Arts.txt', 'r') as f:
         electronics = f.read()
     f.close()
     return electronics
@@ -59,9 +60,22 @@ def read_neg():
     return negative
 
 
-def text_to_dict(electronics):
-    dictionary_for_reviews = list(electronics)
-    return dictionary_for_reviews
+def text_to_dict(amazon_reviews):
+    dictionary = dict()
+    amazon_reviews = amazon_reviews.split('\n')
+
+    matrix = list()
+    for idx in np.arange(0, len(amazon_reviews), 11):
+        reviews = amazon_reviews[idx:idx + 10]
+        aux = list()
+
+        for field in reviews:
+            if not field == '':
+                key, value, *rest = field.split(': ')
+                aux.append(value)
+        matrix.append(aux)
+
+    return matrix
 
 
 def lowercase(texts_from_dict):
@@ -77,26 +91,57 @@ def numbers(texts_from_dict):
 def punctuation_and_spaces(texts_from_dict):
     # removes [!”#$%&’()*+,-./:;<=>?@[\]^_`{|}~]
 
-    texts_from_dict = texts_from_dict.split()
-    no_pnc_space_text = texts_from_dict.translate(string.maketrans("", ""), string.punctuation)
-    return no_pnc_space_text
+    #texts_from_dict = texts_from_dict.split()
+    #no_pnc_space_text = re.sub(rf"[{string.punctuation}]", "", texts_from_dict)
+
+    #doesnt work because of the : needed to separate keys and values, so we maually remove all punctuations except for :
+
+    #punctuations = '''!()-[]{};'"\, <>./?@#$%^&*_~'''
+
+
+    # Removing punctuations in string
+    # Using loop + punctuation string
+    #for i in tqdm(texts_from_dict):
+    #    if i in punctuations:
+    #        no_pnc_space_text = texts_from_dict.replace(i, "")
+    ## PREVIOUS WORKING CODE
+    # remove = string.punctuation
+    # remove = remove.replace(":", "")  # don't remove hyphens
+    # pattern = r"[{}]".format(remove)  # create the pattern
+    #
+    # txt = ")*^%{}[]thi's - is - @@#!a !%%!!%- test."
+    # new_texts_from_dict = re.sub(pattern, "", texts_from_dict)
+    ## END OF PREVIOUS WORKING CODE
+
+    table = str.maketrans('', '', string.punctuation)
+    stop_words = set(stopwords.words('english'))
+    new_dict = texts_from_dict.copy()
+    for i, row in enumerate(new_dict):
+        for j, item in enumerate(row):
+            if j in [8, 9]:
+                tokens = word_tokenize(item)
+                tokens = [w for w in tokens if w.isalpha()]
+                tokens_no_stop = [i for i in tokens if not i in stop_words]
+                tokens_no_punct = [i for i in tokens_no_stop if not i in string.punctuation]
+                new_dict[i][j] = tokens_no_punct
+    return new_dict
 
 
 def tokenize(texts_from_dict):
     stop_words = set(stopwords.words('english'))
-    tokenize = word_tokenize(texts_from_dict.lower())
-    # filtered_sentence = [w for w in tokenize if not w in stop_words]
-    texts_from_dict = str.maketrans('', '', string.punctuation)
-    stripped_texts_from_dict = [w.translate(texts_from_dict) for w in tokenize]
-    words = [w for w in stripped_texts_from_dict if w.isalpha()]  # numbers
-    filtered_stripped_texts_from_dict = [w for w in words if not w in stop_words]
-    filtered_stripped_texts_from_dict = []
+   # stripped_texts_from_dict = [w.translate(texts_from_dict) for w in texts_from_dict]  # tokenize
+    #words = [w for w in stripped_texts_from_dict if w.isalpha()]  # numbers
+    #filtered_stripped_texts_from_dict = [w for w in stripped_texts_from_dict if not w in stop_words]  # stopwords
+    #filtered_stripped_texts_from_dict = []
 
-    for w in words:
-        if w not in stop_words:
-            filtered_stripped_texts_from_dict.append(w)
+    #for w in stripped_texts_from_dict:
+    #    if w not in stop_words:
+    #        filtered_stripped_texts_from_dict.append(w)
 
-    return filtered_stripped_texts_from_dict
+    tokens = word_tokenize(texts_from_dict)
+    result = [i for i in tokens if not i in stop_words]
+
+    return result
 
 
 def positive_tagging():
@@ -122,25 +167,76 @@ def stemming(texts_from_dict):
     return stemmed_text
 
 
-def lemmanization(texts_from_dict):
-    lemmatizer = WordNetLemmatizer()
+def lemming(texts_from_dict):
+
+    lemmas = WordNetLemmatizer()
     lemma_sentence = []
     for word in texts_from_dict:
-        lemma_sentence.append(lemmatizer.lemmatize(word))
+        lemma_sentence.append(lemmas.lemmatize(word))
         lemma_sentence.append(" ")
     return "".join(lemma_sentence)
 
 
-def summarize():
-    ...
+
+def find_proper_nouns(tagged_text):
+    proper_nouns = []
+    i = 0
+    while i < len(tagged_text):
+        if tagged_text[i][1] == 'NNP':
+            if tagged_text[i + 1][1] == 'NNP':
+                proper_nouns.append(tagged_text[i][0].lower() +
+                                    " " + tagged_text[i + 1][0].lower())
+                i += 1
+            else:
+                proper_nouns.append(tagged_text[i][0].lower())
+        i += 1
+    return proper_nouns
+
+
+def summarize(proper_nouns, top_num):
+    counts = dict(Counter(proper_nouns).most_common(top_num))
+    return counts
 
 
 def chunking():
-    ...
+    train_text = state_union.raw('/home/demet/Desktop/Eragon/char.txt')
+    sample_text = state_union.raw('/home/demet/Desktop/Eragon/eldest.txt')
+    custom_sent_tokenizer = PunktSentenceTokenizer(train_text)
+    tokenized = custom_sent_tokenizer.tokenize(sample_text)
+    try:
+        for i in tokenized:
+            words = nltk.word_tokenize(i)
+            tagged = nltk.pos_tag(words)
+            chunkGram = r"""Chunk: {<NNP>*<PRP>*<WRB>*<WP>?}"""
+            chunkParser = nltk.RegexpParser(chunkGram)
+            chunked = chunkParser.parse(tagged)
+            print(chunked)
+            for subtree in chunked.subtrees(filter=lambda t: t.label() == 'Chunk'):
+                print(subtree)
+
+            chunked.draw()
+            print(chunked)
+    except Exception as e:
+        print(str(e))
 
 
 def ner():
-    ...
+    train_text = state_union.raw('...')
+    sample_text = state_union.raw('...')
+    custom_sent_tokenizer = PunktSentenceTokenizer(train_text)
+    tokenized = custom_sent_tokenizer.tokenize(sample_text)
+    # classifier = nltk.NaiveBayesClassifier.train(custom_sent_tokenizer)
+
+    try:
+        for i in tokenized[5:]:
+            words = nltk.word_tokenize(i)
+            tagged = nltk.pos_tag(words)
+            namedEnt = nltk.ne_chunk(tagged, binary=True)
+            namedEnt.draw()
+            print(namedEnt)
+    except Exception as e:
+        print(str(e))
+    # classifier.show_most_informative_features(15)
 
 
 def relation_extraction():

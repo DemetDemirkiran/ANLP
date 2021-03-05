@@ -34,7 +34,7 @@ import os
 from os import path
 import ast
 import multidict as multidict
-from preprocessing import text_to_dict, read
+from preprocessing import text_to_dict, read, tokenize, lowercase, numbers, punctuation_and_spaces
 
 
 
@@ -45,8 +45,11 @@ if __name__ == '__main__':
     nltk.download('wordnet')
 
     reviews = read()
-    dictionary = text_to_dict(reviews)
-    print(dictionary)
+    small = lowercase(reviews)
+    dictionary = text_to_dict(small)
+    punct = punctuation_and_spaces(dictionary)
+    # toknz = tokenize(small)
+
 
 
 
