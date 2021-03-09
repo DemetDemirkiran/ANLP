@@ -38,6 +38,8 @@ import multidict as multidict
 from nltk.stem import WordNetLemmatizer
 import re
 from tqdm import tqdm
+from pandas import DataFrame
+
 
 def read():
     with open('/home/demet/Desktop/ANLP_Project/Arts.txt', 'r') as f:
@@ -83,25 +85,20 @@ def lowercase(texts_from_dict):
     return lower_text
 
 
-def numbers(texts_from_dict):
-    no_numbers = re.sub('[0-9]+', '', texts_from_dict)
-    return no_numbers
-
 
 def punctuation_and_spaces(texts_from_dict):
     # removes [!”#$%&’()*+,-./:;<=>?@[\]^_`{|}~]
 
-    #texts_from_dict = texts_from_dict.split()
-    #no_pnc_space_text = re.sub(rf"[{string.punctuation}]", "", texts_from_dict)
+    # texts_from_dict = texts_from_dict.split()
+    # no_pnc_space_text = re.sub(rf"[{string.punctuation}]", "", texts_from_dict)
 
-    #doesnt work because of the : needed to separate keys and values, so we maually remove all punctuations except for :
+    # doesnt work because of the : needed to separate keys and values, so we maually remove all punctuations except for :
 
-    #punctuations = '''!()-[]{};'"\, <>./?@#$%^&*_~'''
-
+    # punctuations = '''!()-[]{};'"\, <>./?@#$%^&*_~'''
 
     # Removing punctuations in string
     # Using loop + punctuation string
-    #for i in tqdm(texts_from_dict):
+    # for i in tqdm(texts_from_dict):
     #    if i in punctuations:
     #        no_pnc_space_text = texts_from_dict.replace(i, "")
     ## PREVIOUS WORKING CODE
@@ -127,21 +124,24 @@ def punctuation_and_spaces(texts_from_dict):
     return new_dict
 
 
-def tokenize(texts_from_dict):
-    stop_words = set(stopwords.words('english'))
-   # stripped_texts_from_dict = [w.translate(texts_from_dict) for w in texts_from_dict]  # tokenize
-    #words = [w for w in stripped_texts_from_dict if w.isalpha()]  # numbers
-    #filtered_stripped_texts_from_dict = [w for w in stripped_texts_from_dict if not w in stop_words]  # stopwords
-    #filtered_stripped_texts_from_dict = []
+#def tokenize(texts_from_dict):
+    # THIS FUNCTION IS NOW OBSOLETE BECAUSE OF THE FUNCTION punctuation_and_spaces THEREFORE I AM COMMENTING IT OUT
 
-    #for w in stripped_texts_from_dict:
+    #stop_words = set(stopwords.words('english'))
+
+    # stripped_texts_from_dict = [w.translate(texts_from_dict) for w in texts_from_dict]  # tokenize
+    # words = [w for w in stripped_texts_from_dict if w.isalpha()]  # numbers
+    # filtered_stripped_texts_from_dict = [w for w in stripped_texts_from_dict if not w in stop_words]  # stopwords
+    # filtered_stripped_texts_from_dict = []
+
+    # for w in stripped_texts_from_dict:
     #    if w not in stop_words:
     #        filtered_stripped_texts_from_dict.append(w)
 
-    tokens = word_tokenize(texts_from_dict)
-    result = [i for i in tokens if not i in stop_words]
+    #tokens = word_tokenize(texts_from_dict)
+    #result = [i for i in tokens if not i in stop_words]
 
-    return result
+    #return result
 
 
 def positive_tagging():
@@ -168,14 +168,12 @@ def stemming(texts_from_dict):
 
 
 def lemming(texts_from_dict):
-
     lemmas = WordNetLemmatizer()
     lemma_sentence = []
     for word in texts_from_dict:
         lemma_sentence.append(lemmas.lemmatize(word))
         lemma_sentence.append(" ")
     return "".join(lemma_sentence)
-
 
 
 def find_proper_nouns(tagged_text):
@@ -301,3 +299,16 @@ def frequency(distribution):
     fdist.plot(20, cumulative=False)
     plt.show
     return fdist
+
+
+def list_to_dataframe(list):
+    df = DataFrame(list, columns=['product/productID', 'product/title', 'product/price', 'review/userID',
+                                  'review/profileName', 'review/helpfulness', 'review/score',
+                                  'review/time', 'review/summary', 'review/text'])
+    return df
+
+def dataframe_to_csv(df):
+
+    df.to_csv('/home/demet/Desktop/review_dataframe.csv', header=True)
+
+    return df

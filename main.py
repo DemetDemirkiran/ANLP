@@ -34,9 +34,8 @@ import os
 from os import path
 import ast
 import multidict as multidict
-from preprocessing import text_to_dict, read, tokenize, lowercase, numbers, punctuation_and_spaces, lemming, stemming
-
-
+from preprocessing import text_to_dict, read, lowercase,  punctuation_and_spaces, lemming, stemming, \
+    list_to_dataframe, dataframe_to_csv
 
 if __name__ == '__main__':
     nltk.download('averaged_perceptron_tagger')
@@ -48,16 +47,11 @@ if __name__ == '__main__':
     small = lowercase(reviews)
     dictionary = text_to_dict(small)
     punct = punctuation_and_spaces(dictionary)
-    toknz = tokenize(small)
-    #lemmz = lemming(toknz) #Tested this, found that it just added
-                            # more spaces into the list that contains the details of the reviews, not really needed. CURRENTLY
-    stemmz = stemming(toknz)
-
-
-
-
-
-
-
-
-
+    # toknz = tokenize(small) # do not need it because all of te tokenization, and preprocessing is now done in the
+    # function punctuation_and_spaces, the function tokenize is now obsolete
+    # lemmz = lemming(toknz) #Tested this, found that it just added
+    # more spaces into the list that contains the details of the reviews, not really needed. CURRENTLY
+    # stemmz = stemming(toknz) #does not do much at the moment cant tell a difference
+    dtaframe = list_to_dataframe(punct)
+    dtaframe = dataframe_to_csv(dtaframe)
+    #print(dtaframe)
