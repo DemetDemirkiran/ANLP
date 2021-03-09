@@ -34,7 +34,7 @@ import os
 from os import path
 import ast
 import multidict as multidict
-from preprocessing import text_to_dict, read, tokenize, lowercase, numbers, punctuation_and_spaces
+from preprocessing import text_to_dict, read, tokenize, lowercase, numbers, punctuation_and_spaces, lemming, stemming
 
 
 
@@ -48,7 +48,11 @@ if __name__ == '__main__':
     small = lowercase(reviews)
     dictionary = text_to_dict(small)
     punct = punctuation_and_spaces(dictionary)
-    # toknz = tokenize(small)
+    toknz = tokenize(small)
+    #lemmz = lemming(toknz) #Tested this, found that it just added
+                            # more spaces into the list that contains the details of the reviews, not really needed. CURRENTLY
+    stemmz = stemming(toknz)
+
 
 
 
