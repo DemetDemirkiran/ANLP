@@ -2,7 +2,8 @@ import nltk
 import re
 import time
 from nltk.sentiment.util import *
-
+import os
+os.environ['CUDA_VISIBLE_DEVICES']='0'
 from preprocessing import text_to_dict, read, lowercase,  punctuation_and_spaces, lemming, stemming, \
     list_to_dataframe, dataframe_to_csv
 from senti_bert import Senti_Bert
