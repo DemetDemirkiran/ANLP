@@ -1,43 +1,21 @@
-import nltk
-import re
-from nltk.sentiment.util import _show_plot
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords, state_union
-from nltk.stem import PorterStemmer
-from nltk.stem.wordnet import WordNetLemmatizer
-import re
-import time
 from collections import Counter
-import pprint
 from nltk import pos_tag
 from nltk.corpus import state_union
 from nltk.tokenize import PunktSentenceTokenizer
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
-from nltk.classify import NaiveBayesClassifier
-from nltk.corpus import subjectivity
-from nltk.sentiment import SentimentAnalyzer
 from nltk.sentiment.util import *
 from nltk.probability import FreqDist
 import matplotlib.pyplot as plt
-import pandas as pd
 import string
-import matplotlib.animation as animation
-# from pandas.plotting._matplotlib import style
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from scipy.cluster.hierarchy import dendrogram, linkage
-from collections import defaultdict
-from nltk.corpus import opinion_lexicon
-from nltk.tokenize import treebank
 from PIL import Image
 from wordcloud import WordCloud, STOPWORDS
 import numpy as np
 import os
 from os import path
-import ast
 import multidict as multidict
 from nltk.stem import WordNetLemmatizer
 import re
-from tqdm import tqdm
 from pandas import DataFrame
 
 
@@ -116,11 +94,12 @@ def punctuation_and_spaces(texts_from_dict):
     for i, row in enumerate(new_dict):
         for j, item in enumerate(row):
             if j in [8, 9]:
-                tokens = word_tokenize(item)
-                tokens = [w for w in tokens if w.isalpha()]
-                tokens_no_stop = [i for i in tokens if not i in stop_words]
-                tokens_no_punct = [i for i in tokens_no_stop if not i in string.punctuation]
-                new_dict[i][j] = tokens_no_punct
+                # tokens = word_tokenize(item)
+                # tokens = [w for w in item if w.isalpha()]
+                # tokens_no_stop = [i for i in tokens if not i in stop_words]
+                # tokens_no_punct = [i for i in tokens_no_stop if not i in string.punctuation]
+                # new_dict[i][j] = tokens_no_punct
+                pass
     return new_dict
 
 
@@ -309,6 +288,6 @@ def list_to_dataframe(list):
 
 def dataframe_to_csv(df):
 
-    df.to_csv('/home/demet/Desktop/review_dataframe.csv', header=True)
+    df.to_csv('/home/demet/Desktop/review_dataframe_notoken.csv', header=True)
 
     return df
