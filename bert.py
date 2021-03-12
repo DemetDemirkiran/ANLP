@@ -1,7 +1,6 @@
 from transformers import BertTokenizer, BertModel
 from transformers import InputExample, InputFeatures
 import torch
-from torchtext import data
 from nltk.sentiment.util import *
 import nltk
 from splitter import splitter

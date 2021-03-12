@@ -73,7 +73,7 @@ class TextLoader(data.Dataset):
         text_review = text[10]
         text_score = text[7]
 
-        return torch.tensor(text_review), torch.tensor(SCORE_TO_CLASS[str(text_score)])
+        return text_review[:512], torch.tensor(SCORE_TO_CLASS[str(text_score)])
 
 
 if __name__ == '__main__':

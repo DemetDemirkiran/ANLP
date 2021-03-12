@@ -2,20 +2,19 @@ import nltk
 import re
 import time
 from nltk.sentiment.util import *
-import os
-os.environ['CUDA_VISIBLE_DEVICES']='0'
 from preprocessing import text_to_dict, read, lowercase,  punctuation_and_spaces, lemming, stemming, \
     list_to_dataframe, dataframe_to_csv
 from senti_bert import Senti_Bert
 from bert import bert_dataloader
 from splitter import splitter, TextLoader
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 def train(dataloader):
     model = Senti_Bert().cuda()
 
-    for train, target in dataloader:
-        train = train.cuda()
+    for train, target in tqdm(dataloader):
+        train = train
         target = target.cuda()
 
         model(train)
@@ -53,6 +52,6 @@ if __name__ == '__main__':
     dtaframe = list_to_dataframe(punct)
 
     tl = TextLoader('/home/demet/Desktop/review_dataframe_notoken.csv')
-    dataloader = DataLoader(tl, batch_size=4, shuffle=True)
+    dataloader = DataLoader(tl, batch_size=2, shuffle=True)
     train(dataloader)
 
