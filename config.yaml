@@ -1,0 +1,16 @@
+mode: 'test'
+path_to_data: 'D:\\PycharmProjects\\ANLP\\ANLP\\review_dataframe_notoken.csv'
+output_path: 'D:\\PycharmProjects\\ANLP\\ANLP\\experiments'
+
+training:
+  lr: 1e-4
+  epochs: 1
+  batch_size: 10
+
+test:
+  restore_from: 'D:\\PycharmProjects\\ANLP\\ANLP\\experiments\\ckpt0.pth'
+  batch_size: 10
+
+model:
+  name: 'bert'
+

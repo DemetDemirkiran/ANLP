@@ -1,7 +1,6 @@
 from transformers import BertTokenizer, BertModel
 from transformers import InputExample, InputFeatures
 import torch
-from torchtext import data
 from nltk.sentiment.util import *
 import nltk
 from splitter import splitter
@@ -15,10 +14,6 @@ def bert_dataloader(data_list, train, test, train_productID=None):
     train_data = train.to_numpy()
     test_data = test.to_numpy()
     #model.summary()
-
-    # column_list = ['product/productID', 'product/title', 'product/price', 'review/userID',
-    #                              'review/profileName', 'review/helpfulness', 'review/score',
-    #                              'review/time', 'review/summary', 'review/text']
 
     for i in train_data:
         train_productID = i[1]

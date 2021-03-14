@@ -20,10 +20,10 @@ SCORE_TO_CLASS = {
 def splitter(dataset):
 
     data = pd.read_csv(dataset)
-    with open(dataset, 'r') as f:
-        text = f.readlines()
+    #with open(dataset, 'r') as f:
+    #    text = f.readlines()
 
-    text = [t.split(',') for t in text[1:]]
+    #text = [t.split(',') for t in text[1:]]
      #print(data.head())
     # split data into labels and features
     # Labels are the data which we want to predict and features are the data which are used to predict labels.
@@ -31,7 +31,7 @@ def splitter(dataset):
     #product_id = data.productID
     #X = data.drop('product_id', axis=1)
 
-    X_train, X_test= train_test_split(data, test_size=0.2)
+    X_train, X_test= train_test_split(data.to_numpy(), test_size=0.2)
     # print("\nX_train:\n")
     # print(X_train.head())
     # print(X_train.shape)
@@ -49,14 +49,14 @@ class TextLoader(data.Dataset):
         self.mode = mode
         self.path = path
         self.train_data, self.test_data = splitter(self.path)
-        self.train_data = self.train_data.to_numpy()
-        self.test_data = self.test_data.to_numpy()
+        self.train_data = self.train_data
+        self.test_data = self.test_data
 
     def __len__(self):
         if self.mode == 'train':
-            return len(self.train_data) #// 50
+            return len(self.train_data)
         elif self.mode == 'test':
-            return len(self.test_data) #// 50
+            return len(self.test_data)
         else:
             raise ValueError('Wrong mode')
 
@@ -69,11 +69,22 @@ class TextLoader(data.Dataset):
         else:
             raise ValueError('Wrong mode')
 
-        text = text_list[item]
+        text = text_list[item].copy()
         text_review = text[10]
         text_score = text[7]
+        text_usefulness = text[6]
+        text_usefulness = text_usefulness.split('/')
+        text_usefulness[0] = float(text_usefulness[0])
+        text_usefulness[1] = float(text_usefulness[1])
+        # Avoid division by 0
+        if text_usefulness[1] == 0:
+            text_usefulness = 0
+        else:
+            text_usefulness = text_usefulness[0] / text_usefulness[1]
 
-        return torch.tensor(text_review), torch.tensor(SCORE_TO_CLASS[str(text_score)])
+        return {'text': text_review,
+                'score': torch.tensor(SCORE_TO_CLASS[str(text_score)]),
+                'usefulness': torch.tensor(text_usefulness)}
 
 
 if __name__ == '__main__':
