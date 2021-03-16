@@ -1,7 +1,6 @@
-from senti_bert import Senti_Bert
+from senti_bert import Senti_Bert, Senti_Roberta, Senti_DistilBert, Senti_xlnet
 from splitter import TextLoader
 from tqdm import tqdm
-
 import torch
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
@@ -12,7 +11,10 @@ from sklearn.metrics import accuracy_score
 import os
 import yaml
 
-MODEL_DICT = {'bert': Senti_Bert}
+MODEL_DICT = {'bert': Senti_Bert,
+              'distil': Senti_DistilBert,
+              'roberta': Senti_Roberta,
+              'senti': Senti_xlnet}
 
 
 def train(model, dataloader, writer, output_path, num_epochs=10, lr=1e-4):
@@ -111,7 +113,7 @@ if __name__ == '__main__':
     # punct = punctuation_and_spaces(dictionary)
     # dtaframe = list_to_dataframe(punct)
 
-    config_path = 'D:\\PycharmProjects\\ANLP\\ANLP\\config.yaml'
+    config_path = '/home/demet/PycharmProjects/ANLP/config.yaml'
     with open(config_path, 'r') as f:
         config = yaml.load(f, yaml.SafeLoader)
 

@@ -17,30 +17,17 @@ SCORE_TO_CLASS = {
     '5.0': 0
 }
 
+
 def splitter(dataset):
-
+    # the text has been preprocessed first before being fed into anything so additional preprocessing is un-needed other
+    # than BERT tokens
     data = pd.read_csv(dataset)
-    #with open(dataset, 'r') as f:
-    #    text = f.readlines()
+    X_train, X_test = train_test_split(data.to_numpy(), test_size=0.2)
 
-    #text = [t.split(',') for t in text[1:]]
-     #print(data.head())
-    # split data into labels and features
-    # Labels are the data which we want to predict and features are the data which are used to predict labels.
 
-    #product_id = data.productID
-    #X = data.drop('product_id', axis=1)
-
-    X_train, X_test= train_test_split(data.to_numpy(), test_size=0.2)
-    # print("\nX_train:\n")
-    # print(X_train.head())
-    # print(X_train.shape)
-
-    # print("\nX_test:\n")
-    # print(X_test.head())
-    # print(X_test.shape)
 
     return X_train, X_test
+
 
 class TextLoader(data.Dataset):
 
@@ -73,8 +60,11 @@ class TextLoader(data.Dataset):
         text_review = text[10]
         text_score = text[7]
         text_usefulness = text[6]
-        text_usefulness = text_usefulness.split('/')
-        text_usefulness[0] = float(text_usefulness[0])
+        try:
+            text_usefulness = text_usefulness.split('/')
+            text_usefulness[0] = float(text_usefulness[0])
+        except:
+            a = 0
         text_usefulness[1] = float(text_usefulness[1])
         # Avoid division by 0
         if text_usefulness[1] == 0:

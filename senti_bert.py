@@ -1,6 +1,7 @@
-from transformers import BertTokenizer, BertModel
-from transformers import DistilBertTokenizer, DistilBertModel
-from transformers import ElectraTokenizer, ElectraModel
+from transformers import BertTokenizer, BertModel, BertForSequenceClassification
+from transformers import DistilBertTokenizer, DistilBertModel, DistilBertForSequenceClassification
+from transformers import RobertaTokenizer, RobertaModel
+from transformers import XLNetTokenizer, XLNetModel
 import torch
 from torch import nn
 
@@ -16,9 +17,12 @@ class Senti_Bert(nn.Module):
 
     def forward(self, text):
         bert_tokens = self.tokenizer.batch_encode_plus(text,
-                                                       padding='longest', return_tensors='pt')
+                                                       padding='longest',
+                                                       return_tensors='pt')
+
         outputs = self.bert(bert_tokens['input_ids'][:, :256].cuda(),
                             attention_mask=bert_tokens['attention_mask'][:, :256].cuda())
+
         embeddings = torch.mean(outputs.last_hidden_state, dim=1)
         return self.score_fc(embeddings), self.sigmoid(self.regression_fc(embeddings))
 
@@ -33,35 +37,61 @@ class Senti_DistilBert(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, text):
+
         bert_tokens = self.tokenizer.batch_encode_plus(text,
-                                                       padding='longest', return_tensors='pt')
+                                                       padding='longest',
+                                                       return_tensors='pt')
+
         outputs = self.bert(bert_tokens['input_ids'][:, :256].cuda(),
                             attention_mask=bert_tokens['attention_mask'][:, :256].cuda())
+
         embeddings = torch.mean(outputs.last_hidden_state, dim=1)
         return self.score_fc(embeddings), self.sigmoid(self.regression_fc(embeddings))
 
 
-class Senti_Electra(nn.Module):
+class Senti_Roberta(nn.Module):
 
     def __init__(self):
         super().__init__()
-        self.bert = ElectraModel.from_pretrained('google/electra-small-discriminator')
-        self.tokenizer = ElectraTokenizer.from_pretrained('google/electra-small-discriminator')
+        self.bert = RobertaModel.from_pretrained("roberta-base")
+        self.tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
         self.score_fc = nn.Linear(768, 11)
         self.regression_fc = nn.Linear(768, 1)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, text):
         bert_tokens = self.tokenizer.batch_encode_plus(text,
-                                                       padding='longest', return_tensors='pt')
+                                                       padding='longest',
+                                                       return_tensors='pt')
+
         outputs = self.bert(bert_tokens['input_ids'][:, :256].cuda(),
                             attention_mask=bert_tokens['attention_mask'][:, :256].cuda())
+
         embeddings = torch.mean(outputs.last_hidden_state, dim=1)
         return self.score_fc(embeddings), self.sigmoid(self.regression_fc(embeddings))
 
 
 
+class Senti_xlnet(nn.Module):
 
+    def __init__(self):
+        super().__init__()
+        self.bert = XLNetModel.from_pretrained("senti-base-cased")
+        self.tokenizer = XLNetTokenizer.from_pretrained("senti-base-cased")
+        self.score_fc = nn.Linear(768, 11)
+        self.regression_fc = nn.Linear(768, 1)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, text):
+        bert_tokens = self.tokenizer.batch_encode_plus(text,
+                                                       padding='longest',
+                                                       return_tensors='pt')
+
+        outputs = self.bert(bert_tokens['input_ids'][:, :256].cuda(),
+                            attention_mask=bert_tokens['attention_mask'][:, :256].cuda())
+
+        embeddings = torch.mean(outputs.last_hidden_state, dim=1)
+        return self.score_fc(embeddings), self.sigmoid(self.regression_fc(embeddings))
 
 
 
