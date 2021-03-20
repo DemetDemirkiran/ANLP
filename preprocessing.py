@@ -19,25 +19,11 @@ import re
 from pandas import DataFrame
 
 
-def read():
-    with open('/home/demet/Desktop/ANLP_Project/Arts.txt', 'r') as f:
+def read(path):
+    with open(path, 'r') as f:
         electronics = f.read()
     f.close()
     return electronics
-
-
-def read_pos():
-    with open('/home/demet/Desktop/ANLP_Project/positive_words.txt', 'r') as f:
-        positive = f.read()
-    f.close()
-    return positive
-
-
-def read_neg():
-    with open('/home/demet/Desktop/ANLP_Project/negative_words.txt', 'r') as f:
-        negative = f.read()
-    f.close()
-    return negative
 
 
 def text_to_dict(amazon_reviews):
@@ -94,42 +80,33 @@ def punctuation_and_spaces(texts_from_dict):
     for i, row in enumerate(new_dict):
         for j, item in enumerate(row):
             if j in [8, 9]:
-                # tokens = word_tokenize(item)
-                # tokens = [w for w in item if w.isalpha()]
-                # tokens_no_stop = [i for i in tokens if not i in stop_words]
-                # tokens_no_punct = [i for i in tokens_no_stop if not i in string.punctuation]
-                # new_dict[i][j] = tokens_no_punct
+                #tokens = word_tokenize(item)
+                tokens = [w for w in item if w.isalpha()]
+                tokens_no_stop = [i for i in tokens if not i in stop_words]
+                tokens_no_punct = [i for i in tokens_no_stop if not i in string.punctuation]
+                new_dict[i][j] = tokens_no_punct
                 pass
     return new_dict
 
 
-#def tokenize(texts_from_dict):
-    # THIS FUNCTION IS NOW OBSOLETE BECAUSE OF THE FUNCTION punctuation_and_spaces THEREFORE I AM COMMENTING IT OUT
-
-    #stop_words = set(stopwords.words('english'))
-
-    # stripped_texts_from_dict = [w.translate(texts_from_dict) for w in texts_from_dict]  # tokenize
-    # words = [w for w in stripped_texts_from_dict if w.isalpha()]  # numbers
-    # filtered_stripped_texts_from_dict = [w for w in stripped_texts_from_dict if not w in stop_words]  # stopwords
-    # filtered_stripped_texts_from_dict = []
-
-    # for w in stripped_texts_from_dict:
-    #    if w not in stop_words:
-    #        filtered_stripped_texts_from_dict.append(w)
-
-    #tokens = word_tokenize(texts_from_dict)
-    #result = [i for i in tokens if not i in stop_words]
-
-    #return result
-
-
-def positive_tagging():
-    ...
-
-
-def negative_tagging():
-    ...
-
+# def tokenize(texts_from_dict):
+#     THIS FUNCTION IS NOW OBSOLETE BECAUSE OF THE FUNCTION punctuation_and_spaces THEREFORE I AM COMMENTING IT OUT
+#
+#     stop_words = set(stopwords.words('english'))
+#
+#     stripped_texts_from_dict = [w.translate(texts_from_dict) for w in texts_from_dict]  # tokenize
+#     words = [w for w in stripped_texts_from_dict if w.isalpha()]  # numbers
+#     filtered_stripped_texts_from_dict = [w for w in stripped_texts_from_dict if not w in stop_words]  # stopwords
+#     filtered_stripped_texts_from_dict = []
+#
+#     for w in stripped_texts_from_dict:
+#        if w not in stop_words:
+#            filtered_stripped_texts_from_dict.append(w)
+#
+#     tokens = word_tokenize(texts_from_dict)
+#     result = [i for i in tokens if not i in stop_words]
+#
+#     return result
 
 def pos_tagging(texts_from_dict):
     tagged_text = pos_tag(texts_from_dict)
@@ -216,9 +193,6 @@ def ner():
     # classifier.show_most_informative_features(15)
 
 
-def relation_extraction():
-    ...
-
 
 def getFrequencyDictForText(sentence):
     fullTermsDict = multidict.MultiDict()
@@ -287,7 +261,29 @@ def list_to_dataframe(list):
     return df
 
 def dataframe_to_csv(df):
-
-    df.to_csv('/home/demet/Desktop/review_dataframe_notoken.csv', header=True)
+    # hardcoded sace point for csv MUST BE CHANGED FOR TESTING FOR OTHER USERS
+    df = df.to_csv('/home/demet/Desktop/review_dataframe_notoken.csv', header=True)
 
     return df
+
+if __name__ == '__main__':
+    nltk.download('averaged_perceptron_tagger')
+    nltk.download('punkt')
+    nltk.download('stopwords')
+    nltk.download('wordnet')
+
+    # change path to dataset text file to run preprocessing
+    reviews = read('/home/demet/Desktop/ANLP_Project/Arts.txt')
+    small = lowercase(reviews)
+    dictionary = text_to_dict(small)
+    punct = punctuation_and_spaces(dictionary)
+    # toknz = tokenize(small) # do not need it because all of te tokenization, and preprocessing is now done in the
+    # function punctuation_and_spaces, the function tokenize is now obsolete
+    # lemmz = lemming(toknz) #Tested this, found that it just added
+    # more spaces into the list that contains the details of the reviews, not really needed. CURRENTLY
+    # stemmz = stemming(toknz) #does not do much at the moment cant tell a difference
+    dtaframe = list_to_dataframe(punct)
+    dtaframe = dataframe_to_csv(dtaframe)
+
+    print(dtaframe)
+
