@@ -1,0 +1,16 @@
+mode: 'trend'
+path_to_data: '/home/demet/Desktop/review_dataframe_notoken.csv'
+output_path: '/home/demet/PycharmProjects/ANLP/experiments/albert'
+
+training:
+  lr: 1e-4
+  epochs: 1
+  batch_size: 10
+
+test:
+  restore_from: '/home/demet/PycharmProjects/ANLP/experiments/roberta'
+  batch_size: 10
+
+model:
+  name: 'albert'
+
